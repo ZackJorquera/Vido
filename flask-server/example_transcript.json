@@ -1,0 +1,53 @@
+{
+  "name": "6212202767953098955",
+  "metadata": {
+    "@type": "type.googleapis.com/google.cloud.speech.v1.LongRunningRecognizeMetadata",
+    "progressPercent": 100,
+    "startTime": "2017-07-24T10:21:22.013650Z",
+    "lastUpdateTime": "2017-07-24T10:21:45.278630Z"
+  },
+  "done": true,
+  "response": {
+    "@type": "type.googleapis.com/google.cloud.speech.v1.LongRunningRecognizeResponse",
+    "results": [
+      {
+        "alternatives": [
+          {
+            "transcript": "Four score and twenty...(etc)...",
+            "confidence": 0.97186122,
+            "words": [
+              {
+                "startTime": "1.300s",
+                "endTime": "1.400s",
+                "word": "Four"
+              },
+              {
+                "startTime": "1.400s",
+                "endTime": "1.600s",
+                "word": "score"
+              },
+              {
+                "startTime": "1.600s",
+                "endTime": "1.600s",
+                "word": "and"
+              },
+              {
+                "startTime": "1.600s",
+                "endTime": "1.900s",
+                "word": "twenty"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "alternatives": [
+          {
+            "transcript": "for score and plenty...(etc)...",
+            "confidence": 0.9041967
+          }
+        ]
+      }
+    ]
+  }
+}
