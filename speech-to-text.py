@@ -29,14 +29,15 @@ def sample_long_running_recognize(storage_uri):
 
     print(u"Waiting for operation to complete...")
     response = operation.result()
-
+    print(response)
     # The first result includes start and end time word offsets
     result = response.results[0]
     # First alternative is the most probable result
     alternative = result.alternatives[0]
     print(u"Transcript: {}".format(alternative.transcript))
     # Print the start and end time of each word
-    print(alternative)
+    return alternative
+
 def main():
     import argparse
 
@@ -44,11 +45,11 @@ def main():
     parser.add_argument(
         "--storage_uri",
         type=str,
-        default="gs://cloud-samples-data/speech/brooklyn_bridge.flac",
+        default="gs://cloud-samples-data/speech/brooklyn_bridge.wav",
     )
     args = parser.parse_args()
 
-    sample_long_running_recognize(args.storage_uri)
+    output = sample_long_running_recognize(args.storage_uri)
 
 
 if __name__ == "__main__":
