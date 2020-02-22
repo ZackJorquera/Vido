@@ -14,6 +14,8 @@ from subprocess import PIPE, Popen
 import sys
 import shlex
 
+from parser import *
+
 
 logging.basicConfig(level=logging.INFO, format='%(message)s')
 logger = logging.getLogger(__file__)
@@ -23,6 +25,7 @@ logger.setLevel(logging.INFO)
 def _logged_subprocess_call(command):
     logger.debug('Running command: {}'.format(subprocess.list2cmdline(command)))
     return subprocess.call(command, shell=True)  # TODO: change to output to logger
+
     #res = Popen(command, stdout=PIPE, stderr=PIPE)
     #output = res.stdout.read()
     #logger.debug('Output: {}'.format(output))
@@ -37,9 +40,17 @@ def create_audio(in_filename, out_filename):
          .audio
          .output(out_filename)
          .overwrite_output()
-         .compile()
+         .compile() + ['-ac'] + ['1']  # set one audio channel
          )
     )
+
+
+def sentence_to_cut(sent):
+    return {sent.start_time, sent.end_time}
+
+
+def sentences_to_cuts(sent_array):
+    return map(sentence_to_cut, sent_array)
 
 
 if __name__ == '__main__':  # for if you want to run as command line
@@ -54,6 +65,8 @@ if __name__ == '__main__':  # for if you want to run as command line
     parser.add_argument('--timestamps_file', type=str, help='json file of time stamps to make vido with.')
 
     kwargs = vars(parser.parse_args())
+
+    # os.path.join(base_dir, filename)
 
     if kwargs['verbose']:
         logging.basicConfig(level=logging.DEBUG, format='%(levels): %(message)s')
