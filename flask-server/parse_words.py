@@ -1,12 +1,15 @@
 import re
 
 class Sentence(object):
-    def __init__(self):
-        self.text = "IFFy stiff"
+    def __init__(self, text):
+        self.text = text
+        self.length = len(re.split(' |-', text))
+
+    def __str__(self):
+        return str(self.text)
     start_time = 0
     end_time = 0
     val = 0
-    length = 0
 
 
 def test(s):

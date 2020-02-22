@@ -11,8 +11,6 @@ stop_words = ["", " ", "\n", "i", "me", "my", "oh", 'mr', 'mrs', 'ms', 'dr', 'sa
 
 # THis class wants an input in the form of sentences from the parser file
 class Summarizer(object):
-    word_endings = [' ', '-', '--', '.', '!', '?']  # regex would be nice here
-
     def __init__(self, sentences, title=""):
         self.total_words = 0
         self.sentences = sentences
@@ -28,7 +26,7 @@ class Summarizer(object):
                 s.val = 2
             elif s.text[-1] == '?':
                 s.val = 2
-            else:
+            elif s.text[-1] == '.':
                 s.val = 0
             for word in re.split(' |-', s.text):
                 # Add word to total. Used to find the desired output size
@@ -124,6 +122,3 @@ class Summarizer(object):
 def test_thing(s):
     print(s)
 
-
-if __name__ == '__main__':
-    parse_words.test("TEST ")
