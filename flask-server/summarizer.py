@@ -119,6 +119,3 @@ class Summarizer(object):
         return recover_solution(len(sentence_arr), num_words)
 
 
-def test_thing(s):
-    print(s)
-
