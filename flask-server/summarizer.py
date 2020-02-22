@@ -3,6 +3,7 @@
 
 import numpy as np
 import re
+import math
 from parse_words import *
 
 
@@ -81,41 +82,53 @@ class Summarizer(object):
                 else:
                     s.val += sw_val
 
-    def create_summary(self, percent_words=0.0, num_words=0):
+    def create_summary(self, percent_words=0.0, num_words=0, length_of_video=0.0):
         if percent_words == 0 and num_words == 0:
             return "Error: summary size not specified"
         # parse data to get points for each sentence
         self.eval_sentences()
         if percent_words != 0.0:
-            return self.opt_summary(self.sentences, int(percent_words*self.total_words))
+            return self.opt_summary_times(self.sentences, int(percent_words*self.total_words))
+        elif length_of_video != 0.0:
+            return self.opt_summary_times(self.sentences, num_words)
         else:
-            return self.opt_summary(self.sentences, num_words)
+            return self.opt_summary_times(self.sentences, num_words)
 
     @staticmethod
-    def opt_summary(sentence_arr, num_words):
+    def opt_summary_times(sentence_arr, max_weight, by_time=False):
+        """
+
+        :param sentence_arr:
+        :param max_weight: either number of words or number of seconds, not nano seconds
+        :param by_time:
+        :return:
+        """
         def recover_solution(i, j):
             solution = []
             while i > 0 and j > 0:
-                if opt[i, j] == opt[i-1, j]:
+                if opt[i, j] == opt[i - 1, j]:
                     i -= 1
                 else:
-                    solution.append(sentence_arr[i-1])
-                    j -= sentence_arr[i-1].length
+                    solution.append(
+                        {"start_time": sentence_arr[i - 1].start_time, "end_time": sentence_arr[i - 1].end_time})
+                    j -= sentence_arr[i - 1].sentence_weight(by_time)
                     i -= 1
             return solution[::-1]
 
         # This initializes our base cases to 0. Because we iterate through all items everything can be zero
-        opt = np.array([[0 for _ in range(num_words + 1)] for _ in range(len(sentence_arr) + 1)])
+        opt = np.array([[0 for _ in range(max_weight + 1)] for _ in range(len(sentence_arr) + 1)])
         # This initializes our base cases
 
         for i in range(1, len(sentence_arr) + 1):
-            for j in range(1, num_words + 1):
+            for j in range(1, max_weight + 1):
                 # It is important to not that every time we access the opt array we use i and j and ever time
                 # we access the w_arr ir v_arr we use i-1 or j-1. This is because item 1 is index 0.
-                if j - sentence_arr[i-1].length >= 0:
-                    opt[i, j] = max(opt[i - 1, j], opt[i - 1, j - sentence_arr[i-1].length] + sentence_arr[i-1].val)
+                if j - sentence_arr[i - 1].sentence_weight(by_time) >= 0:
+                    opt[i, j] = max(opt[i - 1, j], opt[i - 1, j - sentence_arr[i - 1].sentence_weight(by_time)] +
+                                    sentence_arr[i - 1].val)
                 else:
                     opt[i, j] = opt[i - 1, j]
-        return recover_solution(len(sentence_arr), num_words)
+        return recover_solution(len(sentence_arr), max_weight)
+
 
 
