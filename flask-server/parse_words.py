@@ -99,6 +99,7 @@ def parse(transcript, words, start_times, end_times):
         i.text = re.sub(r'[ \t\n\r]+', ' ', i.text).lower()
 
     return sentenceList
+    
 transcript, words, start_seconds, end_seconds = speech_to_text.run()
 list = parse(transcript,words, start_seconds, end_seconds)
 
