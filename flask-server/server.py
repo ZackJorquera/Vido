@@ -8,8 +8,9 @@ import asyncio
 import time
 
 from video_stuff import *
+from runner import run_vidoizer
 
-from flask import Flask, render_template, jsonify, abort, request, make_response, url_for
+from flask import Flask, render_template, jsonify, abort, request, make_response, send_file, url_for
 # from flask_cors import CORS  # is this needed
 
 app = Flask(__name__)
@@ -32,6 +33,27 @@ def start():
     return render_template("index.html")  # react will make index.html
 
 
+@app.route('/noreact', methods=['GET'])
+def start_noreact():
+    return render_template("index_noreact.html")
+
+
+@app.route('/noreact', methods=['POST'])
+def start_noreact_post():
+    if 'file' not in request.files:
+        abort(400)
+    file = request.files['file']
+    if file.filename == '':
+        abort(400)
+
+    file_path = to_working_video_file(file.filename)
+    file.save(file_path)
+
+    out_file = run_vidoizer(file_path, 'out_file.mp4')
+
+    return send_file(out_file, as_attachment=True)
+
+
 def task_run_vido_stuff(start_file):
     time.sleep(10)
     return "Done :)"
@@ -49,13 +71,9 @@ def upload_file():
     file_path = to_working_video_file(file.filename)
     file.save(file_path)
 
-    print(file_path)
+    out_file = run_vidoizer(file_path, 'out_file.mp4')
 
-    html_addr = "http://localhost:5000/" + file_path.replace("\\", "/")
-
-    print(html_addr)
-
-    return jsonify({'upload_success': True, 'out_file': file_path.replace("\\", "/")})
+    return send_file(out_file, as_attachment=True)
 
 
 @app.route('/download_file', methods=['GET'])
