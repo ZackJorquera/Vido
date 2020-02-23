@@ -51,12 +51,17 @@ def start_noreact_post():
 
     out_file = run_vidoizer(file_path, 'out_file.mp4')
 
-    return send_file(out_file, as_attachment=True)
+    return send_file(out_file, as_attachment=True)  # just in case
 
 
-def task_run_vido_stuff(start_file):
-    time.sleep(10)
-    return "Done :)"
+@app.route('/videos/<file_name>', methods=['GET'])
+def grab_videos_file(file_name):
+    print("hello")
+    file_name = os.path.join(VIDEO_WORKING_DIR, file_name)
+    if os.path.exists(file_name):
+        return send_file(file_name)  # allow reading of this file
+    else:
+        abort(400)
 
 
 @app.route('/upload_file', methods=['POST'])
@@ -72,8 +77,10 @@ def upload_file():
     file.save(file_path)
 
     out_file = run_vidoizer(file_path, 'out_file.mp4')
+    out_file = os.path.join(VIDEO_WORKING_DIR, os.path.basename(out_file))
 
-    return send_file(out_file, as_attachment=True)
+    # return send_file(out_file, as_attachment=True)
+    return jsonify({'upload_success': True, 'out_file': out_file.replace('\\','/')}) # send file path
 
 
 @app.route('/download_file', methods=['GET'])
@@ -86,4 +93,4 @@ def check_file():
 
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=5000, debug=True)  # threaded=True,
+    app.run(threaded=True, host='0.0.0.0', port=5000, debug=True)  # threaded=True,
