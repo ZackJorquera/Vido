@@ -7,9 +7,13 @@ import os
 from google.cloud import speech
 from google.cloud.speech import enums
 from google.cloud.speech import types
+
+from google.oauth2 import service_account
+
+
 import wave
 
-GOOGLE_APPLICATION_CREDENTIALS = "service-account-file.json"
+credentials = service_account.Credentials.from_service_account_file('service-account-file.json')
 def sample_long_running_recognize(storage_uri):
     """
     Print start and end time of each word spoken in audio file from Cloud Storage
@@ -18,8 +22,8 @@ def sample_long_running_recognize(storage_uri):
       storage_uri URI for audio file in Cloud Storage, e.g. gs://[BUCKET]/[FILE]
     """
     #file_name = filepath + audio_file_name
-    client = speech_v1.SpeechClient()
-
+    client = speech_v1.SpeechClient(credentials=credentials)
+    # os.environ["GOOGLE_APPLICATION_CREDENTIALS"]=credentials
     # storage_uri = 'gs://cloud-samples-data/speech/brooklyn_bridge.flac'
 
     # When enabled, the first result returned by the API will include a list
@@ -71,7 +75,7 @@ from google.cloud import speech_v1
 import io
 
 def sample_long_running_recognize2(storage_uri):
-    client = speech_v1.SpeechClient()
+    client = speech_v1.SpeechClient(credentials=credentials)
     words = []
     start_seconds = []
     end_seconds = []
