@@ -1,16 +1,23 @@
-
 import json
+import math
 import re
 import speech_to_text
 
 
-class Sentence(object): # Ian wants a list of sentences
+class Sentence(object):
     def __init__(self, text, start_time, end_time, lenght):
         self.text = text
         self.start_time = start_time
         self.end_time = end_time
         self.length = lenght
-    val = 0
+        self.val = 0
+
+    def sentence_weight(self, by_time=False):
+        if by_time:
+            return (self.end_time - self.start_time) / math.pow(10, 9)
+        else:
+            return self.length
+
 
 #copied from https://stackoverflow.com/questions/4576077/how-to-split-a-text-into-sentences
 alphabets= "([A-Za-z])"
@@ -20,6 +27,7 @@ starters = "(Mr|Mrs|Ms|Dr|He\s|She\s|It\s|They\s|Their\s|Our\s|We\s|But\s|Howeve
 acronyms = "([A-Z][.][A-Z][.](?:[A-Z][.])?)"
 websites = "[.](com|net|org|io|gov)"
 digits = "([0-9])"
+
 
 def split_into_sentences(text):
     text = " " + text + "  "
@@ -59,19 +67,19 @@ def parse(transcript, words, start_times, end_times):
     # Print the start and end time of each word
     sentences = split_into_sentences(transcript)
     pos = 0
-    #turn sentences into objects
+    # turn sentences into objects
     sentenceList = []
     for i in sentences:
         senLen = len(re.split(' |-', str(i)))
         sentenceList.append(Sentence(i, 0, 0, senLen))
 
     for i in sentenceList:
-        #find first word of sentence
+        # find first word of sentence
         if i.length > 2:
             first, *middle, last = i.text.split()
             last = last[:-1]
 
-            #find corresponding first word
+            # find corresponding first word
             for j in range(pos, len(words)):
                 if words[j].lower() == first.lower():
                     pos = j  #update pos
