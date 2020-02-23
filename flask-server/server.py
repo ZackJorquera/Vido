@@ -9,9 +9,6 @@ import time
 
 from video_stuff import *
 
-helper_tasks = []  # type tuple of id, task, and ret val
-id_iter = 0
-
 from flask import Flask, render_template, jsonify, abort, request, make_response, url_for
 # from flask_cors import CORS  # is this needed
 
@@ -37,6 +34,7 @@ def start():
 
 def task_run_vido_stuff(start_file):
     time.sleep(10)
+    return "Done :)"
 
 
 @app.route('/upload_file', methods=['POST'])
@@ -51,34 +49,23 @@ def upload_file():
     file_path = to_working_video_file(file.filename)
     file.save(file_path)
 
-    id_iter += 1
-    helper_tasks.append( (id_iter, asyncio.create_task( task_run_vido_stuff(file_path) )) )
-    return jsonify({'upload_success': True, 'task_id': id_iter})
+    print(file_path)
+
+    html_addr = "http://localhost:5000/" + file_path.replace("\\", "/")
+
+    print(html_addr)
+
+    return jsonify({'upload_success': True, 'out_file': file_path.replace("\\", "/")})
 
 
-@app.route('/check_file', methods=['GET'])
+@app.route('/download_file', methods=['GET'])
 def check_file():
     # we want to poke the task to see if it is done
     # if it is done return the file and remove the task
-    if 'task_id' not in request:
-        abort(400)
 
-    task_id = request['task_id']
-
-    task_filt = filter(lambda id, task: id == task_id, helper_tasks)
-    if len(task_filt) == 0:
-        abort(400)
-
-    id, task = task_filt[0]
-
-    file_ready = task.done()
-    if file_ready:
-        res_path = task.result()
-    else:
-        res_path = ""
-
-    return jsonify({'file_ready': file_ready, 'file': res_path})
+    abort(404)
+    #return send_file(path, as_attachment=True)
 
 
 if __name__ == "__main__":
-    app.run(threaded=True, host='0.0.0.0', port=5000, debug=True)
+    app.run(host='0.0.0.0', port=5000, debug=True)  # threaded=True,
