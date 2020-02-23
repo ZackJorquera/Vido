@@ -1,4 +1,6 @@
 venv/
 .idea/
 service-account-file.json
+secondary_validation.json
 dir-name/
+

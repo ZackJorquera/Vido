@@ -73,10 +73,11 @@ def upload_file():
     if file.filename == '':
         abort(400)
 
+    file_name_data = os.path.splitext(file.filename)
     file_path = to_working_video_file(file.filename)
     file.save(file_path)
 
-    out_file = run_vidoizer(file_path, 'out_file.mp4')
+    out_file = run_vidoizer(file_path, file_name_data[0] + "new" + file_name_data[1])
     out_file = os.path.join(VIDEO_WORKING_DIR, os.path.basename(out_file))
 
     # return send_file(out_file, as_attachment=True)

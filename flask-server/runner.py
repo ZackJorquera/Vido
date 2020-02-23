@@ -24,7 +24,7 @@ def run_vidoizer(video_path, out_filename):
         summary = Summarizer(sentence_list)
         res = summary.create_summary(length_of_video=18)
     except:
-        res = [{'start_time': 12, 'end_time': 20}, {'start_time': 60, 'end_time': 68}, {'start_time': 83, 'end_time': 91}]
+        res = [{'start_time': 60, 'end_time': 68}, {'start_time': 83, 'end_time': 91}]
 
     print(res)
 
@@ -39,4 +39,4 @@ def run_vidoizer(video_path, out_filename):
 if __name__ == "__main__":
     INFILE = "test_vid.mp4"
     video_path = video_stuff.to_working_video_file(INFILE)
-    run_vidoizer(video_path)
+    run_vidoizer(video_path, "out_file.mp4")
