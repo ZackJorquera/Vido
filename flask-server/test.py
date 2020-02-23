@@ -10,10 +10,10 @@ if __name__ == '__main__':
     # this will grab from preloaded bucket
     # THis is an example of what this file needs
 
-    INFILE = "videos/How_virtual_reality_turns_students_into_scientists_Jessica_Ochoa_Hendrix[youtubetomp4.org].mp4"
-    # TODO: use to_working_video_file(file_name)
+    INFILE = "test_vid.mp4"
+    video_path = video_stuff.to_working_video_file(INFILE)
 
-    flac_file = video_stuff.create_audio(INFILE, os.path.basename(INFILE) + '.flac')
+    flac_file = video_stuff.create_audio(video_path, os.path.basename(video_path) + '.flac')
 
     transcript, words, start_seconds, end_seconds = speech_to_text.run(os.path.dirname(flac_file),
                                                                        os.path.basename(flac_file))
