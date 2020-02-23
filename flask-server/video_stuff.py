@@ -19,7 +19,7 @@ import shlex
 import json
 import time
 
-from parse_words import Sentence
+# from parse_words import Sentence
 
 VIDEO_WORKING_DIR = "videos"
 
