@@ -12,19 +12,19 @@ def run_vidoizer(video_path, out_filename):
 
     flac_file = video_stuff.create_audio(video_path, os.path.basename(video_path) + '.flac')
 
-    try:
-        transcript, words, start_seconds, end_seconds = speech_to_text.run(os.path.dirname(flac_file),
-                                                                           os.path.basename(flac_file))
+    #try:
+    transcript, words, start_seconds, end_seconds = speech_to_text.run(os.path.dirname(flac_file),
+                                                                       os.path.basename(flac_file))
 
-        # THis will then return out sentence list
-        sentence_list = parse(transcript, words, start_seconds, end_seconds)
+    # THis will then return out sentence list
+    sentence_list = parse(transcript, words, start_seconds, end_seconds)
 
-        print([(s.start_time, s.end_time) for s in sentence_list])
+    print([(s.start_time, s.end_time) for s in sentence_list])
 
-        summary = Summarizer(sentence_list)
-        res = summary.create_summary(length_of_video=18)
-    except:
-        res = [{'start_time': 60, 'end_time': 68}, {'start_time': 83, 'end_time': 91}]
+    summary = Summarizer(sentence_list)
+    res = summary.create_summary(length_of_video=180)
+    #except:
+        #res = [{'start_time': 12, 'end_time': 20}, {'start_time': 60, 'end_time': 68}, {'start_time': 83, 'end_time': 91}]
 
     print(res)
 
