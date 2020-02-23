@@ -4,7 +4,7 @@
 import numpy as np
 import re
 import math
-from parse_words import *
+from summarizer import *
 
 
 stop_words = ["", " ", "\n", "i", "me", "my", "oh", 'mr', 'mrs', 'ms', 'dr', 'said', "myself", "we", "our", "ours", "ourselves", "you", "your", "yours", "yourself", "yourselves", "he", "him", "his", "himself", "she", "her", "hers", "herself", "it", "its", "itself", "they", "them", "their", "theirs", "themselves", "what", "which", "who", "whom", "this", "that", "these", "those", "am", "is", "are", "was", "were", "be", "been", "being", "have", "has", "had", "having", "do", "does", "did", "doing", "a", "an", "the", "and", "but", "if", "or", "because", "as", "until", "while", "of", "at", "by", "for", "with", "about", "against", "between", "into", "through", "during", "before", "after", "above", "below", "to", "from", "up", "down", "in", "out", "on", "off", "over", "under", "again", "further", "then", "once", "here", "there", "when", "where", "why", "how", "all", "any", "both", "each", "few", "more", "most", "other", "some", "such", "no", "nor", "not", "only", "own", "same", "so", "than", "too", "very", "s", "t", "can", "will", "just", "don", "should", "now"]
@@ -25,13 +25,13 @@ class Summarizer(object):
         for s in self.sentences:
             if s.text[-1] == '!':
                 s.val = 2
-                s.text = s.test[:-1]
+                s.text = s.text[:-1]
             elif s.text[-1] == '?':
                 s.val = 2
-                s.text = s.test[:-1]
+                s.text = s.text[:-1]
             elif s.text[-1] == '.':
                 s.val = 0
-                s.text = s.test[:-1]
+                s.text = s.text[:-1]
             for word in re.split('[ \-]', s.text):
                 # Add word to total. Used to find the desired output size
                 self.total_words += 1
@@ -70,26 +70,26 @@ class Summarizer(object):
                 self.words[w] += title_word
 
         # now we want to give each sentence its own value
-        for s in self.sentences:
+        for s in range(len(self.sentences)):
             # Add some additional value based on where in the transcript the sentence
             # this might be slow but who cares
             l = len(self.sentences)
-            s.val += sentence_loc_mult*4*math.pow(s - l/2, 2)/(math.pow(l, 2))
+            self.sentences[s].val += sentence_loc_mult*4*math.pow(s - l/2, 2)/(math.pow(l, 2))
 
-            if s.length < word_thres:
-                s.val = 0
+            if self.sentences[s].length < word_thres:
+                self.sentences[s].val = 0
                 continue
-            for w in re.split('[ \-]', s.text):
+            for w in re.split('[ \-]', self.sentences[s].text):
                 # For each word in the sentence we add the value
                 if w not in stop_words:
                     if w in self.words:
-                        s.val += self.words[w]
+                        self.sentences[s].val += self.words[w]
                     else:
                         # this should never happen. If it does its treated as a stop word
                         print('*** Word not found: ' + w)
-                        s.val += sw_val
+                        self.sentences[s].val += sw_val
                 else:
-                    s.val += sw_val
+                    self.sentences[s].val += sw_val
 
     def create_summary(self, percent_words=0.0, num_words=0, length_of_video=0.0):
         if percent_words == 0 and num_words == 0:
@@ -106,7 +106,6 @@ class Summarizer(object):
     @staticmethod
     def opt_summary_times(sentence_arr, max_weight, by_time=False):
         """
-
         :param sentence_arr:
         :param max_weight: either number of words or number of seconds, not nano seconds
         :param by_time:
@@ -118,8 +117,8 @@ class Summarizer(object):
                 if opt[i, j] == opt[i - 1, j]:
                     i -= 1
                 else:
-                    solution.append(
-                        {"start_time": sentence_arr[i - 1].start_time, "end_time": sentence_arr[i - 1].end_time})
+                    # solution.append({"start_time": sentence_arr[i - 1].start_time, "end_time": sentence_arr[i - 1].end_time})
+                    solution.append(sentence_arr[i-1].text)
                     j -= sentence_arr[i - 1].sentence_weight(by_time)
                     i -= 1
             return solution[::-1]
@@ -138,6 +137,3 @@ class Summarizer(object):
                 else:
                     opt[i, j] = opt[i - 1, j]
         return recover_solution(len(sentence_arr), max_weight)
-
-
-

@@ -1,6 +1,4 @@
 from google.cloud import speech_v1
-import video_stuff
-
 from pydub import AudioSegment
 import io
 import os
@@ -150,5 +148,5 @@ def run():
     return sample_long_running_recognize2(args.storage_uri)
     # print(output)
 
-if __name__ == "__main__":
-    run()
+# if __name__ == "__main__":
+#     run()
