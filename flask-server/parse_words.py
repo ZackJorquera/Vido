@@ -1,3 +1,4 @@
+
 import json
 import re
 import speech_to_text
@@ -91,3 +92,6 @@ def parse(transcript, words, start_times, end_times):
     return sentenceList
 transcript, words, start_seconds, end_seconds = speech_to_text.run()
 list = parse(transcript,words, start_seconds, end_seconds)
+
+# Ian wants a list of sentences
+
