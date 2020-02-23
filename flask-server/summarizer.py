@@ -25,11 +25,14 @@ class Summarizer(object):
         for s in self.sentences:
             if s.text[-1] == '!':
                 s.val = 2
+                s.text = s.test[:-1]
             elif s.text[-1] == '?':
                 s.val = 2
+                s.text = s.test[:-1]
             elif s.text[-1] == '.':
                 s.val = 0
-            for word in re.split(' |-', s.text):
+                s.text = s.test[:-1]
+            for word in re.split('[ \-]', s.text):
                 # Add word to total. Used to find the desired output size
                 self.total_words += 1
                 # Count number of each word
@@ -76,7 +79,7 @@ class Summarizer(object):
             if s.length < word_thres:
                 s.val = 0
                 continue
-            for w in re.split(' |-', s.text):
+            for w in re.split('[ \-]', s.text):
                 # For each word in the sentence we add the value
                 if w not in stop_words:
                     if w in self.words:
