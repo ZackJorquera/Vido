@@ -10,6 +10,8 @@ from google.cloud import speech_v1
 from google.cloud.speech_v1 import enums
 from google.oauth2 import service_account
 from google.cloud import speech_v1
+from google.cloud import storage
+
 import io
 
 # This should be moved but for now, this works
@@ -78,17 +80,19 @@ def upload_blob(bucket_name, source_file_name, destination_blob_name):
 
     blob.upload_from_filename(source_file_name)
 
-def run():
+def run(filepath, audio_file_name):
+
     import argparse
-    # bucket_name = "audio-hackcuvi-bucket"
-    # source_file_name = filepath + audio_file_name
-    # destination_blob_name = audio_file_name
-    # gcs_uri = 'gs://' + bucketname + '/' + audio_file_name
+    bucket_name = "audio-hackcuvi-bucket"
+    source_file_name = os.path.join(filepath, audio_file_name)
+    destination_blob_name = audio_file_name
+    gcs_uri = 'gs://' + bucket_name + '/' + audio_file_name
+    upload_blob(bucket_name,source_file_name,destination_blob_name)
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--storage_uri",
         type=str,
-        default="gs://audio-hackcuvi-bucket/How_virtual_reality_turns_students_into_scientists_Jessica_Ochoa_Hendrix[youtubetomp4.org]-[AudioTrimmer.com].flac"
+        default=gcs_uri
     )
     args = parser.parse_args()
     return sample_long_running_recognize2(args.storage_uri)
@@ -96,4 +100,4 @@ def run():
 
 
 if __name__ == "__main__":
-    run()
+    run("videos/", "How_virtual_reality_turns_students_into_scientists_Jessica_Ochoa_Hendrix[youtubetomp4.org].mp4.flac")

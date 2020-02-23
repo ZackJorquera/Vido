@@ -4,36 +4,35 @@
 # -v --create_vido_file --midstep_filenames "chunk_{0}.{1}" --timestamps_file "videos/data.json" videos/How_virtual_reality_turns_students_into_scientists_Jessica_Ochoa_Hendrix[youtubetomp4.org].mp4 test_out1.mp4
 # -v --create_audio_file videos/How_virtual_reality_turns_students_into_scientists_Jessica_Ochoa_Hendrix[youtubetomp4.org].mp4 How_virtual_reality_turns_students_into_scientists_Jessica_Ochoa_Hendrix[youtubetomp4.org].flac
 
-from __future__ import unicode_literals
+# from __future__ import unicode_literals
 
 import argparse
-import errno
 import ffmpeg  # get ffmpeg-python and then download https://ffmpeg.org/download.html
 import logging
 import os
 import re
 import subprocess
-from subprocess import PIPE, Popen
 import sys
 import shlex
 import json
 import time
 
-# from parse_words import Sentence
-
 VIDEO_WORKING_DIR = "videos"
 
-
-# TODO: remove videos folder and add automatic
+SEC_OR_NS = 1
 
 logging.basicConfig(level=logging.INFO, format='%(message)s')
 logger = logging.getLogger(__file__)
 logger.setLevel(logging.INFO)
 
 
-def to_working_video_file(file_name):
+def verify_create_working_dir():
     if not os.path.exists(VIDEO_WORKING_DIR):
         os.makedirs(VIDEO_WORKING_DIR)
+
+
+def to_working_video_file(file_name):
+    verify_create_working_dir()
 
     new_file_loc = os.path.join(VIDEO_WORKING_DIR, os.path.basename(file_name))
 
@@ -44,31 +43,28 @@ def _logged_subprocess_call(command):
     logger.debug('Running command: {}'.format(subprocess.list2cmdline(command)))
     return subprocess.call(command, shell=True)  # TODO: change to output to logger
 
-    #res = Popen(command, shell=True, stdout=PIPE, stderr=PIPE)
-    #output = res.stdout.read()
-    #logger.debug('Output: {}'.format(output))
-    #print(res.returncode)
-    #return res.returncode
-
 
 def create_audio(in_filename, out_filename):
+    verify_create_working_dir()
     out_filename = os.path.join(VIDEO_WORKING_DIR, out_filename)
 
     output_kwargs = {'ac': 1}
 
     cmd = ffmpeg.input(in_filename).audio.output(out_filename, **output_kwargs).overwrite_output().compile()
 
-    _logged_subprocess_call(cmd)
+    if _logged_subprocess_call(cmd) != 0:
+        raise ValueError('Failed to run ffmpeg cmd:\"{}\" in create_audio.'.format(subprocess.list2cmdline(cmd)))
 
     return os.path.abspath(out_filename)
 
 
 def cut_video(in_filename, cuts, midstep_filenames='chunk_{0}.{1}'):
+    verify_create_working_dir()
     i = 0
     chunks = []
     for cut in cuts:
-        start_time = int(cut['start_time']) / 1000
-        end_time = int(cut['end_time']) / 1000
+        start_time = int(cut['start_time'] / SEC_OR_NS)
+        end_time = int(cut['end_time'] / SEC_OR_NS)
         i = i+1
 
         input_kwargs = {}
@@ -83,10 +79,14 @@ def cut_video(in_filename, cuts, midstep_filenames='chunk_{0}.{1}'):
         cmd = ffmpeg.input(in_filename, **input_kwargs).output(chunk_name).overwrite_output().compile()
         ret = _logged_subprocess_call(cmd)
 
+        if ret != 0:
+            raise ValueError('Failed to run ffmpeg cmd:\"{}\" in cut_video.'.format(subprocess.list2cmdline(cmd)))
+
     return chunks
 
 
 def merge_to_vido(chunks, out_filename, tmp_file="merge_vids_{0}.txt"):
+    verify_create_working_dir()
     out_filename = os.path.join(VIDEO_WORKING_DIR, out_filename)
 
     tmp_file = os.path.join(VIDEO_WORKING_DIR, tmp_file.format("rand_string"))
@@ -100,6 +100,9 @@ def merge_to_vido(chunks, out_filename, tmp_file="merge_vids_{0}.txt"):
     cmd = ffmpeg.input(tmp_file, **input_kwargs).output(out_filename, **output_kwargs).overwrite_output().compile()
     ret = _logged_subprocess_call(cmd)
 
+    if ret != 0:
+        raise ValueError('Failed to run ffmpeg cmd:\"{}\" in merge_to_vido.'.format(subprocess.list2cmdline(cmd)))
+
     os.remove(tmp_file)
 
     return os.path.abspath(out_filename)
@@ -107,7 +110,8 @@ def merge_to_vido(chunks, out_filename, tmp_file="merge_vids_{0}.txt"):
 
 def clean_tmp_files(chunks):
     for file in chunks:
-        os.remove(file)
+        if os.path.isfile(file):
+            os.remove(file)
 
 
 if __name__ == '__main__':  # for if you want to run as command line
