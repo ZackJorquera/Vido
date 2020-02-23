@@ -138,6 +138,3 @@ class Summarizer(object):
                 else:
                     opt[i, j] = opt[i - 1, j]
         return recover_solution(len(sentence_arr), max_weight)
-
-
-

@@ -2,6 +2,7 @@ import json
 import math
 import re
 import speech_to_text
+import summarizer
 
 
 class Sentence(object):
@@ -100,9 +101,9 @@ def parse(transcript, words, start_times, end_times):
     return sentenceList
 transcript, words, start_seconds, end_seconds = speech_to_text.run()
 list = parse(transcript,words, start_seconds, end_seconds)
-<<<<<<< HEAD
-=======
 
-# Ian wants a list of Sentences
+summary = Summarizer(list)
 
->>>>>>> e3630bbe68de7c586dd2d83565f8ba48f8b2ae1b
+res = summary.create_summary(percent_words = .50)
+
+print(res)
