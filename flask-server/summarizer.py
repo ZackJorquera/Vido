@@ -90,7 +90,7 @@ class Summarizer(object):
                 else:
                     self.sentences[s].val += sw_val
 
-    def create_summary(self, percent_words=0.0, num_words=0, length_of_video=0.0):
+    def create_summary(self, percent_words=0.0, num_words=0, length_of_video=0):
         if percent_words == 0 and num_words == 0 and length_of_video == 0:
             return "Error: summary size not specified"
         # parse data to get points for each sentence
@@ -98,7 +98,8 @@ class Summarizer(object):
         if percent_words != 0.0:
             return self.opt_summary_times(self.sentences, int(percent_words*self.total_words))
         elif length_of_video != 0.0:
-            return self.opt_summary_times(self.sentences, length_of_video, by_time=True)
+            # It is up to the user to provide percent values
+            return self.opt_summary_times(self.sentences, int(length_of_video), by_time=True)
         else:
             return self.opt_summary_times(self.sentences, num_words)
 
