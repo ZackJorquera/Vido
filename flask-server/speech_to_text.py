@@ -1,6 +1,4 @@
 from google.cloud import speech_v1
-import video_stuff
-
 from pydub import AudioSegment
 import io
 import os
