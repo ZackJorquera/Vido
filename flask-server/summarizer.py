@@ -118,7 +118,8 @@ class Summarizer(object):
                     i -= 1
                 else:
                     solution.append(
-                        {"start_time": sentence_arr[i - 1].start_time, "end_time": sentence_arr[i - 1].end_time})
+                        {"start_time": sentence_arr[i - 1].start_time, "end_time": sentence_arr[i - 1].end_time,
+                         "text": sentence_arr[i-1].text})
                     j -= sentence_arr[i - 1].sentence_weight(by_time)
                     i -= 1
             return solution[::-1]

@@ -71,14 +71,16 @@ def parse(transcript, words, start_times, end_times):
     # turn sentences into objects
     sentenceList = []
     for i in sentences:
-        senLen = len(re.split(' |-', str(i)))
+        senLen = len(re.split(' ', str(i)))
 
         # This would be
-        sentenceList.append(Sentence(i, 0, 0, senLen))
+        print(i)
+        if i != '.':
+            sentenceList.append(Sentence(i, 0, 0, senLen))
 
     for i in sentenceList:
         # find first word of sentence
-        split_sentence = re.split(' |-', i.text[:-1])
+        split_sentence = re.split(' ', i.text)
         first = split_sentence[0]
         last = split_sentence[-1]
 
@@ -96,9 +98,10 @@ def parse(transcript, words, start_times, end_times):
 
 
 if __name__ == '__main__':
+    pass
     # this will grab from preloaded bucket
     # THis is an example of what this file needs
-    transcript, words, start_seconds, end_seconds = speech_to_text.run()
+    """transcript, words, start_seconds, end_seconds = speech_to_text.run()
 
     # THis will then return out sentence list
     sentence_list = parse(transcript, words, start_seconds, end_seconds)
@@ -108,4 +111,4 @@ if __name__ == '__main__':
     summary = Summarizer(sentence_list)
     res = summary.create_summary(length_of_video=18)
 
-    print(res)
+    print(res)"""
