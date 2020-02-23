@@ -4,6 +4,7 @@ import speech_to_text
 from summarizer import *
 from parse_words import *
 import os
+import json
 
 
 def run_vidoizer(video_path, out_filename):
@@ -27,6 +28,9 @@ def run_vidoizer(video_path, out_filename):
         #res = [{'start_time': 12, 'end_time': 20}, {'start_time': 60, 'end_time': 68}, {'start_time': 83, 'end_time': 91}]
 
     print(res)
+
+    with open('cached_vid.json', 'w') as fp:
+        json.dump(res, fp)
 
     chunks = video_stuff.cut_video(video_path, res)
     outfile = video_stuff.merge_to_vido(chunks, out_filename)
