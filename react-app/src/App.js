@@ -7,9 +7,8 @@ const App = () => (
 
   <div style={{
     display: 'flex',
+    flexDirection: 'column',
     backgroundColor: "#ffffff",
-    textAign: 'center',
-    justifyContent: 'center',
     fontFamily: 'Gill Sans',
   }}>
     <Main />

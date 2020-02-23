@@ -1,0 +1,9 @@
+.Main {
+  background-color: "#ffffff";
+  display: flex;
+  text-align: center;
+  justify-content: center;
+}
+input::placeholder {
+  color: "#9b4dca";
+}
