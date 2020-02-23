@@ -35,6 +35,9 @@ set_verbose()
 
 def youtube_download_file(url):
     file_path = to_working_video_file('youtube_vid')
+    if os.path.isfile(file_path + ".mkv"):
+        os.remove(file_path + ".mkv")
+
     ydl_opts = {'outtmpl': file_path}
     with youtube_dl.YoutubeDL(ydl_opts) as ydl:
         ydl.download([url])
