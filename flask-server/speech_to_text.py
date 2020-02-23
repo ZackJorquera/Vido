@@ -5,22 +5,20 @@ import os
 from google.cloud import speech
 from google.cloud.speech import enums
 from google.cloud.speech import types
+from google.oauth2 import service_account
 import wave
 from google.cloud import speech_v1
 from google.cloud.speech_v1 import enums
-from google.oauth2 import service_account
-from google.cloud import speech_v1
 from google.cloud import storage
 
+
+from google.cloud import speech_v1
 import io
 
-# This should be moved but for now, this works
 credentials = service_account.Credentials.from_service_account_file(
         'service-account-file.json')
-
-
 def sample_long_running_recognize2(storage_uri):
-    client = speech_v1.SpeechClient(credentials=credentials)
+    client = speech_v1.SpeechClient()
     words = []
     start_seconds = []
     end_seconds = []
@@ -74,17 +72,16 @@ def sample_long_running_recognize2(storage_uri):
 
 def upload_blob(bucket_name, source_file_name, destination_blob_name):
     """Uploads a file to the bucket."""
-    storage_client = storage.Client()
+    storage_client = storage.Client.from_service_account_json("service-account-file.json")
     bucket = storage_client.get_bucket(bucket_name)
     blob = bucket.blob(destination_blob_name)
 
     blob.upload_from_filename(source_file_name)
 
-def run(filepath, audio_file_name):
-
+def run(filepath,audio_file_name):
     import argparse
     bucket_name = "audio-hackcuvi-bucket"
-    source_file_name = os.path.join(filepath, audio_file_name)
+    source_file_name = filepath + audio_file_name
     destination_blob_name = audio_file_name
     gcs_uri = 'gs://' + bucket_name + '/' + audio_file_name
     upload_blob(bucket_name,source_file_name,destination_blob_name)
@@ -98,6 +95,5 @@ def run(filepath, audio_file_name):
     return sample_long_running_recognize2(args.storage_uri)
     # print(output)
 
-
-if __name__ == "__main__":
-    run("videos/", "How_virtual_reality_turns_students_into_scientists_Jessica_Ochoa_Hendrix[youtubetomp4.org].mp4.flac")
+# if __name__ == "__main__":
+##run("", "test.flac")
