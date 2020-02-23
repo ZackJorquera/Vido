@@ -102,10 +102,10 @@ def parse(transcript, words, start_times, end_times):
 transcript, words, start_seconds, end_seconds = speech_to_text.run()
 list = parse(transcript,words, start_seconds, end_seconds)
 
-print(list)
+#print(list)
 
 summary = Summarizer(list)
 
-res = summary.create_summary(percent_words = .50)
+res = summary.create_summary(percent_words = .25)
 
 print(res)

@@ -19,7 +19,7 @@ import shlex
 import json
 import time
 
-from parse_words import Sentence
+# from parse_words import Sentence
 
 VIDEO_WORKING_DIR = "videos"
 
@@ -31,8 +31,13 @@ logger = logging.getLogger(__file__)
 logger.setLevel(logging.INFO)
 
 
-def get_working_dir():
-    return VIDEO_WORKING_DIR
+def to_working_video_file(file_name):
+    if not os.path.exists(VIDEO_WORKING_DIR):
+        os.makedirs(VIDEO_WORKING_DIR)
+
+    new_file_loc = os.path.join(VIDEO_WORKING_DIR, os.path.basename(file_name))
+
+    return new_file_loc
 
 
 def _logged_subprocess_call(command):
