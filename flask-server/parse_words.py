@@ -106,6 +106,6 @@ if __name__ == '__main__':
     print([(s.start_time, s.end_time) for s in sentence_list])
 
     summary = Summarizer(sentence_list)
-    res = summary.create_summary(percent_words=.25)
+    res = summary.create_summary(percent_words=1)
 
     print(res)

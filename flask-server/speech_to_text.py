@@ -8,12 +8,17 @@ from google.cloud.speech import types
 import wave
 from google.cloud import speech_v1
 from google.cloud.speech_v1 import enums
-
+from google.oauth2 import service_account
 from google.cloud import speech_v1
 import io
 
+# This should be moved but for now, this works
+credentials = service_account.Credentials.from_service_account_file(
+        'service-account-file.json')
+
+
 def sample_long_running_recognize2(storage_uri):
-    client = speech_v1.SpeechClient()
+    client = speech_v1.SpeechClient(credentials=credentials)
     words = []
     start_seconds = []
     end_seconds = []
