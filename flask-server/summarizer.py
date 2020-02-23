@@ -39,15 +39,16 @@ class Summarizer(object):
                     else:
                         self.words[word] = 1
 
-        # This is copied over as much of it has already been optimized
+        # some of this is copied over as it has already been optimized and tested
         # These variables represent the adjustments. all fractional point are rounded down
         std_mult = 1  # How many point a word get for each standard deviation above occurrences mean it is
         under_mean = 1  # For any word with number of occurrences bellow the mean, this is added
         per_word = 0  # baseline number of points added for every word
         char_mult = 1/3  # For every character in a word above 6 character it will receive this many points.
         title_word = 3  # Additional points if word is in the title
-        word_thres = 5  # Only sentences with this many or more words will be considered
+        word_thres = 3  # Only sentences with this many or more words will be considered
         sw_val = 0  # Number of points a sentence gets for each stop word
+        sentence_loc_mult = 5  # No testing has gone into finding this number. Very cool idea
 
         mean = np.array([self.words[k] for k in self.words]).mean()
         mean_squared = np.array([self.words[k]*self.words[k] for k in self.words]).mean()
@@ -67,6 +68,11 @@ class Summarizer(object):
 
         # now we want to give each sentence its own value
         for s in self.sentences:
+            # Add some additional value based on where in the transcript the sentence
+            # this might be slow but who cares
+            l = len(self.sentences)
+            s.val += sentence_loc_mult*4*math.pow(s - l/2, 2)/(math.pow(l, 2))
+
             if s.length < word_thres:
                 s.val = 0
                 continue

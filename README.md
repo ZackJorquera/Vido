@@ -7,7 +7,7 @@ we must spend multiple continuous minutes watching videos. Videos are now
 accessible at the length you desire. Imagine opening youtube, and seeing a 
 30 minute video, well now imagine watching a 5 minute professionally 
 summarized version containing only the most important sentences.
-Welcome to the future
+Welcome to the future.
 
 ## Setup
 You will need to install ffmpeg. We are using the ffmpeg python bindings in the ffmpeg-python library. 
