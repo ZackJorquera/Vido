@@ -5,70 +5,7 @@ import os
 from google.cloud import speech
 from google.cloud.speech import enums
 from google.cloud.speech import types
-
-from google.oauth2 import service_account
-
-
 import wave
-<<<<<<< HEAD
-=======
-
-credentials = service_account.Credentials.from_service_account_file('service-account-file.json')
-def sample_long_running_recognize(storage_uri):
-    """
-    Print start and end time of each word spoken in audio file from Cloud Storage
-
-    Args:
-      storage_uri URI for audio file in Cloud Storage, e.g. gs://[BUCKET]/[FILE]
-    """
-    #file_name = filepath + audio_file_name
-    client = speech_v1.SpeechClient(credentials=credentials)
-    # os.environ["GOOGLE_APPLICATION_CREDENTIALS"]=credentials
-    # storage_uri = 'gs://cloud-samples-data/speech/brooklyn_bridge.flac'
-
-    # When enabled, the first result returned by the API will include a list
-    # of words and the start and end time offsets (timestamps) for those words.
-    enable_word_time_offsets = True
-    enable_automatic_punctuation = True
-
-    # The language of the supplied audio
-    language_code = "en-US"
-    config = {
-        "enable_word_time_offsets": enable_word_time_offsets,
-        "enable_automatic_punctuation": enable_automatic_punctuation,
-        "language_code": language_code,
-    }
-    audio = {"uri": storage_uri}
-
-    operation = client.recognize(config, audio)
-
-    print(u"Waiting for operation to complete...")
-    response = operation.result()
-
-    # The first result includes start and end time word offsets
-    result = response.results[0]
-    print(result)
-    # First alternative is the most probable result
-    alternative = result.alternatives[0]
-    print(u"Transcript: {}".format(alternative.transcript))
-    # Print the start and end time of each word
-    for word in alternative.words:
-        print(u"Word: {}".format(word.word))
-        words.append(word.word)
-        print(
-            u"Start time: {} seconds {} nanos".format(
-                word.start_time.seconds, word.start_time.nanos
-            )
-        )
-        start_seconds.append(word.start_time.seconds + word.start_time.nanos/1e+9)
-        print(
-            u"End time: {} seconds {} nanos".format(
-                word.end_time.seconds, word.end_time.nanos
-            )
-        )
-        start_seconds.append(word.end_time.seconds + word.end_time.nanos/1e+9)
-    return alternative.words
->>>>>>> 56777eb8ced40838bf50e6de9a1b89cc987bf712
 from google.cloud import speech_v1
 from google.cloud.speech_v1 import enums
 
@@ -76,7 +13,7 @@ from google.cloud import speech_v1
 import io
 
 def sample_long_running_recognize2(storage_uri):
-    client = speech_v1.SpeechClient(credentials=credentials)
+    client = speech_v1.SpeechClient()
     words = []
     start_seconds = []
     end_seconds = []
@@ -124,7 +61,6 @@ def sample_long_running_recognize2(storage_uri):
                 )
             )
             end_seconds.append(word.end_time.seconds + word.end_time.nanos/1e+9)
-            print(word.end_time.seconds + word.end_time.nanos/1e+9)
         print(u"Transcript: {}".format(alternative.transcript))
         total_text += (alternative.transcript)
     return total_text, words, start_seconds, end_seconds
