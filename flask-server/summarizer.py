@@ -3,6 +3,7 @@
 
 import numpy as np
 import re
+import math
 from parse_words import *
 
 
@@ -11,8 +12,6 @@ stop_words = ["", " ", "\n", "i", "me", "my", "oh", 'mr', 'mrs', 'ms', 'dr', 'sa
 
 # THis class wants an input in the form of sentences from the parser file
 class Summarizer(object):
-    word_endings = [' ', '-', '--', '.', '!', '?']  # regex would be nice here
-
     def __init__(self, sentences, title=""):
         self.total_words = 0
         self.sentences = sentences
@@ -28,7 +27,7 @@ class Summarizer(object):
                 s.val = 2
             elif s.text[-1] == '?':
                 s.val = 2
-            else:
+            elif s.text[-1] == '.':
                 s.val = 0
             for word in re.split(' |-', s.text):
                 # Add word to total. Used to find the desired output size
@@ -40,15 +39,16 @@ class Summarizer(object):
                     else:
                         self.words[word] = 1
 
-        # This is copied over as much of it has already been optimized
+        # some of this is copied over as it has already been optimized and tested
         # These variables represent the adjustments. all fractional point are rounded down
         std_mult = 1  # How many point a word get for each standard deviation above occurrences mean it is
         under_mean = 1  # For any word with number of occurrences bellow the mean, this is added
         per_word = 0  # baseline number of points added for every word
         char_mult = 1/3  # For every character in a word above 6 character it will receive this many points.
         title_word = 3  # Additional points if word is in the title
-        word_thres = 5  # Only sentences with this many or more words will be considered
+        word_thres = 3  # Only sentences with this many or more words will be considered
         sw_val = 0  # Number of points a sentence gets for each stop word
+        sentence_loc_mult = 5  # No testing has gone into finding this number. Very cool idea
 
         mean = np.array([self.words[k] for k in self.words]).mean()
         mean_squared = np.array([self.words[k]*self.words[k] for k in self.words]).mean()
@@ -68,6 +68,11 @@ class Summarizer(object):
 
         # now we want to give each sentence its own value
         for s in self.sentences:
+            # Add some additional value based on where in the transcript the sentence
+            # this might be slow but who cares
+            l = len(self.sentences)
+            s.val += sentence_loc_mult*4*math.pow(s - l/2, 2)/(math.pow(l, 2))
+
             if s.length < word_thres:
                 s.val = 0
                 continue
@@ -83,47 +88,53 @@ class Summarizer(object):
                 else:
                     s.val += sw_val
 
-    def create_summary(self, percent_words=0.0, num_words=0):
+    def create_summary(self, percent_words=0.0, num_words=0, length_of_video=0.0):
         if percent_words == 0 and num_words == 0:
             return "Error: summary size not specified"
         # parse data to get points for each sentence
         self.eval_sentences()
         if percent_words != 0.0:
-            return self.opt_summary(self.sentences, int(percent_words*self.total_words))
+            return self.opt_summary_times(self.sentences, int(percent_words*self.total_words))
+        elif length_of_video != 0.0:
+            return self.opt_summary_times(self.sentences, num_words)
         else:
-            return self.opt_summary(self.sentences, num_words)
+            return self.opt_summary_times(self.sentences, num_words)
 
     @staticmethod
-    def opt_summary(sentence_arr, num_words):
+    def opt_summary_times(sentence_arr, max_weight, by_time=False):
+        """
+
+        :param sentence_arr:
+        :param max_weight: either number of words or number of seconds, not nano seconds
+        :param by_time:
+        :return:
+        """
         def recover_solution(i, j):
             solution = []
             while i > 0 and j > 0:
-                if opt[i, j] == opt[i-1, j]:
+                if opt[i, j] == opt[i - 1, j]:
                     i -= 1
                 else:
-                    solution.append(sentence_arr[i-1])
-                    j -= sentence_arr[i-1].length
+                    solution.append(
+                        {"start_time": sentence_arr[i - 1].start_time, "end_time": sentence_arr[i - 1].end_time})
+                    j -= sentence_arr[i - 1].sentence_weight(by_time)
                     i -= 1
             return solution[::-1]
 
         # This initializes our base cases to 0. Because we iterate through all items everything can be zero
-        opt = np.array([[0 for _ in range(num_words + 1)] for _ in range(len(sentence_arr) + 1)])
+        opt = np.array([[0 for _ in range(max_weight + 1)] for _ in range(len(sentence_arr) + 1)])
         # This initializes our base cases
 
         for i in range(1, len(sentence_arr) + 1):
-            for j in range(1, num_words + 1):
+            for j in range(1, max_weight + 1):
                 # It is important to not that every time we access the opt array we use i and j and ever time
                 # we access the w_arr ir v_arr we use i-1 or j-1. This is because item 1 is index 0.
-                if j - sentence_arr[i-1].length >= 0:
-                    opt[i, j] = max(opt[i - 1, j], opt[i - 1, j - sentence_arr[i-1].length] + sentence_arr[i-1].val)
+                if j - sentence_arr[i - 1].sentence_weight(by_time) >= 0:
+                    opt[i, j] = max(opt[i - 1, j], opt[i - 1, j - sentence_arr[i - 1].sentence_weight(by_time)] +
+                                    sentence_arr[i - 1].val)
                 else:
                     opt[i, j] = opt[i - 1, j]
-        return recover_solution(len(sentence_arr), num_words)
+        return recover_solution(len(sentence_arr), max_weight)
 
 
-def test_thing(s):
-    print(s)
 
-
-if __name__ == '__main__':
-    parse_words.test("TEST ")
