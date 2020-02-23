@@ -40,23 +40,27 @@ def start_noreact():
 
 @app.route('/noreact', methods=['POST'])
 def start_noreact_post():
-    if 'file' not in request.files:
-        abort(400)
-    file = request.files['file']
-    if file.filename == '':
+    if 'file' in request.files and request.files['file'].filename != '':
+        file = request.files['file']
+        if file.filename == '':
+            abort(400)
+
+        file_name_data = os.path.splitext(file.filename)
+        file_path = to_working_video_file(file.filename)
+        file.save(file_path)
+    elif 'youtube_url' in request.form and request.form['youtube_url'] != 'youtube_url':
+        file_path = youtube_download_file(request.form['youtube_url'])
+        file_name_data = os.path.splitext(os.path.basename(file_path))
+    else:
         abort(400)
 
-    file_path = to_working_video_file(file.filename)
-    file.save(file_path)
-
-    out_file = run_vidoizer(file_path, 'out_file.mp4')
+    out_file = run_vidoizer(file_path, file_name_data[0] + "new" + file_name_data[1])
 
     return send_file(out_file, as_attachment=True)  # just in case
 
 
 @app.route('/videos/<file_name>', methods=['GET'])
 def grab_videos_file(file_name):
-    print("hello")
     file_name = os.path.join(VIDEO_WORKING_DIR, file_name)
     if os.path.exists(file_name):
         return send_file(file_name)  # allow reading of this file
@@ -66,16 +70,19 @@ def grab_videos_file(file_name):
 
 @app.route('/upload_file', methods=['POST'])
 def upload_file():
-    if 'file' not in request.files:
-        abort(400)
+    if 'file' in request.files and request.files['file'].filename != '':
+        file = request.files['file']
+        if file.filename == '':
+            abort(400)
 
-    file = request.files['file']
-    if file.filename == '':
+        file_name_data = os.path.splitext(file.filename)
+        file_path = to_working_video_file(file.filename)
+        file.save(file_path)
+    elif 'youtube_url' in request.form and request.form['youtube_url'] != 'youtube_url':
+        file_path = youtube_download_file(request.form['youtube_url'])
+        file_name_data = os.path.splitext(os.path.basename(file_path))
+    else:
         abort(400)
-
-    file_name_data = os.path.splitext(file.filename)
-    file_path = to_working_video_file(file.filename)
-    file.save(file_path)
 
     out_file = run_vidoizer(file_path, file_name_data[0] + "new" + file_name_data[1])
     out_file = os.path.join(VIDEO_WORKING_DIR, os.path.basename(out_file))

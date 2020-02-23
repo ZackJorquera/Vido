@@ -3,6 +3,8 @@ templates/index.html
 
 videos/
 
+cached_vid.json
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

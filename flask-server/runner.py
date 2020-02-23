@@ -35,7 +35,7 @@ def run_vidoizer(video_path, out_filename):
     chunks = video_stuff.cut_video(video_path, res)
     outfile = video_stuff.merge_to_vido(chunks, out_filename)
 
-    video_stuff.clean_tmp_files(chunks)
+    video_stuff.clean_tmp_files(chunks, flac_file)
 
     return outfile
 

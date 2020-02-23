@@ -16,6 +16,7 @@ import sys
 import shlex
 import json
 import time
+import youtube_dl
 
 VIDEO_WORKING_DIR = "videos"
 
@@ -31,6 +32,13 @@ def set_verbose():
 
 set_verbose()
 
+
+def youtube_download_file(url):
+    file_path = to_working_video_file('youtube_vid')
+    ydl_opts = {'outtmpl': file_path}
+    with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+        ydl.download([url])
+    return file_path + ".mkv"
 
 
 def verify_create_working_dir():
@@ -117,10 +125,13 @@ def merge_to_vido(chunks, out_filename, tmp_file="merge_vids_{0}.txt"):
     return os.path.abspath(out_filename)
 
 
-def clean_tmp_files(chunks):
+def clean_tmp_files(chunks, flac_file):
     for file in chunks:
         if os.path.isfile(file):
             os.remove(file)
+
+    if os.path.isfile(flac_file):
+        os.remove(flac_file)
 
 
 if __name__ == '__main__':  # for if you want to run as command line
