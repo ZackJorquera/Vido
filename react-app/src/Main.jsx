@@ -50,8 +50,8 @@ class Main extends React.Component {
 
         <div style={{ display: 'flex', flexDirection: 'row'}}>
 
-          <img src={logo} style={{height: 75, marginTop: 25}}/>
-          <h1 style={{fontSize: 75, fontWeight: 700, paddingTop: 15,  paddingRight: 15, paddingBottom: 15, fontFamily: 'Roboto'}}>Vido</h1>
+          <img src={logo} style={{justifyContent: 'flex-start', height: 65, marginTop: 50}}/>
+          <h1 style={{fontSize: 75, fontWeight: 700, paddingTop: 35,  paddingRight: 15, paddingBottom: 15, fontFamily: 'Roboto'}}>Vido</h1>
 
 
           <form
@@ -88,7 +88,7 @@ class Main extends React.Component {
       : null }
         { this.state.finUpload ?
         <div
-          style={{position: 'absolute', marginHorizontal: 200, top: 200, left: 50, height: 0, width: 0}}
+          style={{position: 'absolute', marginHorizontal: 200, top: 120, left: 50, height: 0, width: 0}}
         >
           <Player path={this.state.vidPath} />
         </div>
