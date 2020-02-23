@@ -28,4 +28,4 @@ def test(s):
 if __name__ == '__main__':
     pass
 
-# Ian wants a list of sentences
+# Ian wants a list of Sentences
