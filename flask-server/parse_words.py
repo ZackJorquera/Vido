@@ -2,7 +2,7 @@ import json
 import math
 import re
 import speech_to_text
-import summarizer
+from summarizer import *
 
 
 class Sentence(object):
@@ -101,6 +101,8 @@ def parse(transcript, words, start_times, end_times):
     return sentenceList
 transcript, words, start_seconds, end_seconds = speech_to_text.run()
 list = parse(transcript,words, start_seconds, end_seconds)
+
+print(list)
 
 summary = Summarizer(list)
 
