@@ -1,2 +1,4 @@
 venv/
 .idea/
+service-account-file.json
+dir-name/
