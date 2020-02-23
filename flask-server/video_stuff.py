@@ -25,6 +25,13 @@ logging.basicConfig(level=logging.INFO, format='%(message)s')
 logger = logging.getLogger(__file__)
 logger.setLevel(logging.INFO)
 
+def set_verbose():
+    logging.basicConfig(level=logging.DEBUG, format='%(levels): %(message)s')
+    logger.setLevel(logging.DEBUG)
+
+set_verbose()
+
+
 
 def verify_create_working_dir():
     if not os.path.exists(VIDEO_WORKING_DIR):
@@ -63,8 +70,10 @@ def cut_video(in_filename, cuts, midstep_filenames='chunk_{0}.{1}'):
     i = 0
     chunks = []
     for cut in cuts:
-        start_time = int(cut['start_time'] / SEC_OR_NS)
-        end_time = int(cut['end_time'] / SEC_OR_NS)
+        start_time = cut['start_time'] / SEC_OR_NS - 0.5
+        if start_time < 0:
+            start_time = 0
+        end_time = cut['end_time'] / SEC_OR_NS + 0.5
         i = i+1
 
         input_kwargs = {}
