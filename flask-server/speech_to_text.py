@@ -8,8 +8,7 @@ from google.cloud import speech
 from google.cloud.speech import enums
 from google.cloud.speech import types
 import wave
-words = []
-start_nanoseconds = []
+
 GOOGLE_APPLICATION_CREDENTIALS = "service-account-file.json"
 def sample_long_running_recognize(storage_uri):
     """
@@ -26,11 +25,13 @@ def sample_long_running_recognize(storage_uri):
     # When enabled, the first result returned by the API will include a list
     # of words and the start and end time offsets (timestamps) for those words.
     enable_word_time_offsets = True
+    enable_automatic_punctuation = True
 
     # The language of the supplied audio
     language_code = "en-US"
     config = {
         "enable_word_time_offsets": enable_word_time_offsets,
+        "enable_automatic_punctuation": enable_automatic_punctuation,
         "language_code": language_code,
     }
     audio = {"uri": storage_uri}
@@ -55,12 +56,13 @@ def sample_long_running_recognize(storage_uri):
                 word.start_time.seconds, word.start_time.nanos
             )
         )
-        start_nanoseconds.append(word.end_time.seconds + word.end_time.nanos/1e+9)
+        start_seconds.append(word.start_time.seconds + word.start_time.nanos/1e+9)
         print(
             u"End time: {} seconds {} nanos".format(
                 word.end_time.seconds, word.end_time.nanos
             )
         )
+        start_seconds.append(word.end_time.seconds + word.end_time.nanos/1e+9)
     return alternative.words
 from google.cloud import speech_v1
 from google.cloud.speech_v1 import enums
@@ -68,38 +70,11 @@ from google.cloud.speech_v1 import enums
 from google.cloud import speech_v1
 import io
 
-
-def sample_recognize(local_file_path, model):
-    """
-    Transcribe a short audio file using a specified transcription model
-
-    Args:
-      local_file_path Path to local audio file, e.g. /path/audio.wav
-      model The transcription model to use, e.g. video, phone_call, default
-      For a list of available transcription models, see:
-      https://cloud.google.com/speech-to-text/docs/transcription-model#transcription_models
-    """
-
-    client = speech_v1.SpeechClient()
-
-    local_file_path = 'MBp1.flac'
-    #model = 'phone_call'
-
-    # The language of the supplied audio
-    language_code = "en-US"
-    config = {"model": model, "language_code": language_code}
-    with io.open(local_file_path, "rb") as f:
-        content = f.read()
-    audio = {"content": content}
-
-    response = client.recognize(config, audio)
-    for result in response.results:
-        # First alternative is the most probable result
-        alternative = result.alternatives[0]
-        print(u"Transcript: {}".format(alternative.transcript))
 def sample_long_running_recognize2(storage_uri):
     client = speech_v1.SpeechClient()
-
+    words = []
+    start_seconds = []
+    end_seconds = []
     # storage_uri = 'gs://cloud-samples-data/speech/brooklyn_bridge.raw'
 
     # Sample rate in Hertz of the audio data sent
@@ -108,11 +83,13 @@ def sample_long_running_recognize2(storage_uri):
     # The language of the supplied audio
     language_code = "en-US"
     enable_word_time_offsets = True
+    enable_automatic_punctuation = True
     # Encoding of audio data sent. This sample sets this explicitly.
     # This field is optional for FLAC and WAV audio formats.
-    encoding = enums.RecognitionConfig.AudioEncoding.LINEAR16
+    encoding = enums.RecognitionConfig.AudioEncoding.FLAC
     config = {
         "enable_word_time_offsets": enable_word_time_offsets,
+        "enable_automatic_punctuation": enable_automatic_punctuation,
         "language_code": language_code,
         "encoding": encoding,
     }
@@ -123,10 +100,28 @@ def sample_long_running_recognize2(storage_uri):
     print(u"Waiting for operation to complete...")
     response = operation.result()
     print(response)
+    total_text = ''
     for result in response.results:
         # First alternative is the most probable result
         alternative = result.alternatives[0]
+        for word in alternative.words:
+            print(u"Word: {}".format(word.word))
+            words.append(word.word)
+            print(
+                u"Start time: {} seconds {} nanos".format(
+                    word.start_time.seconds, word.start_time.nanos
+                )
+            )
+            start_seconds.append(word.start_time.seconds + word.start_time.nanos/1e+9)
+            print(
+                u"End time: {} seconds {} nanos".format(
+                    word.end_time.seconds, word.end_time.nanos
+                )
+            )
+            end_seconds.append(word.end_time.seconds + word.end_time.nanos/1e+9)
         print(u"Transcript: {}".format(alternative.transcript))
+        total_text += (alternative.transcript + ".")
+    return total_text, words, start_seconds, end_seconds
 
 def upload_blob(bucket_name, source_file_name, destination_blob_name):
     """Uploads a file to the bucket."""
@@ -135,7 +130,7 @@ def upload_blob(bucket_name, source_file_name, destination_blob_name):
     blob = bucket.blob(destination_blob_name)
 
     blob.upload_from_filename(source_file_name)
-def main():
+def run():
     import argparse
     # bucket_name = "audio-hackcuvi-bucket"
     # source_file_name = filepath + audio_file_name
@@ -145,11 +140,11 @@ def main():
     parser.add_argument(
         "--storage_uri",
         type=str,
-        default="gs://audio-hackcuvi-bucket/OSR_us_000_0036_8k.wav"
+        default="gs://audio-hackcuvi-bucket/How_virtual_reality_turns_students_into_scientists_Jessica_Ochoa_Hendrix[youtubetomp4.org].flac"
     )
     args = parser.parse_args()
-    output = sample_long_running_recognize2(args.storage_uri)
-    print(output)
+    return sample_long_running_recognize2(args.storage_uri)
+    # print(output)
 
 if __name__ == "__main__":
-    main()
+    run()
