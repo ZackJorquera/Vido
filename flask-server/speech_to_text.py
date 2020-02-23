@@ -81,7 +81,7 @@ def upload_blob(bucket_name, source_file_name, destination_blob_name):
 def run(filepath,audio_file_name):
     import argparse
     bucket_name = "audio-hackcuvi-bucket"
-    source_file_name = filepath + audio_file_name
+    source_file_name = os.path.join(filepath, audio_file_name)
     destination_blob_name = audio_file_name
     gcs_uri = 'gs://' + bucket_name + '/' + audio_file_name
     upload_blob(bucket_name,source_file_name,destination_blob_name)

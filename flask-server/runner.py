@@ -43,4 +43,4 @@ def run_vidoizer(video_path, out_filename):
 if __name__ == "__main__":
     INFILE = "test_vid.mp4"
     video_path = video_stuff.to_working_video_file(INFILE)
-    run_vidoizer(video_path, "outfile.mp4")
+    run_vidoizer(video_path, "out_file.mp4")
