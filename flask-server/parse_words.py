@@ -13,9 +13,9 @@ class Sentence(object):
         self.length = length
         self.val = 0
 
-    def sentence_weight(self, by_time=False):
+    def sentence_weight(self, by_time=False) -> int:
         if by_time:
-            return self.end_time - self.start_time
+            return int(round(self.end_time - self.start_time))
         else:
             return self.length
 
@@ -66,7 +66,7 @@ def parse(transcript, words, start_times, end_times):
     # First alternative is the most probable result
     # Print the start and end time of each word
     sentences = split_into_sentences(transcript)
-    print(sentences)
+
     pos = 0
     # turn sentences into objects
     sentenceList = []
@@ -106,6 +106,6 @@ if __name__ == '__main__':
     print([(s.start_time, s.end_time) for s in sentence_list])
 
     summary = Summarizer(sentence_list)
-    res = summary.create_summary(percent_words=1)
+    res = summary.create_summary(length_of_video=18)
 
     print(res)
