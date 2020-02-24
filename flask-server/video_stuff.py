@@ -35,13 +35,26 @@ set_verbose()
 
 def youtube_download_file(url):
     file_path = to_working_video_file('youtube_vid')
-    if os.path.isfile(file_path + ".mkv"):
-        os.remove(file_path + ".mkv")
+    ext = '.mkv'
+
+    for name in os.listdir(VIDEO_WORKING_DIR):
+        if os.path.splitext(name)[0] == 'youtube_vid':
+            ext = os.path.splitext(name)[1]
+            break
+
+    if os.path.isfile(file_path + ext):
+        os.remove(file_path + ext)
 
     ydl_opts = {'outtmpl': file_path}
     with youtube_dl.YoutubeDL(ydl_opts) as ydl:
         ydl.download([url])
-    return file_path + ".mkv"
+
+    for name in os.listdir(VIDEO_WORKING_DIR):
+        if os.path.splitext(name)[0] == 'youtube_vid':
+            file_path += os.path.splitext(name)[1]
+            break
+
+    return file_path
 
 
 def verify_create_working_dir():
